@@ -1,17 +1,21 @@
-import { ArrowUpRight, Mail, MessageCircle, Phone } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { siteConfig } from "@/config/site.config";
 import { formatAddressLines, formatIndianPhone, todayInClinicTimeZone, whatsappUrl } from "@/lib/format";
-import { cn } from "@/lib/utils";
 import { BrandWordmark } from "./brand-wordmark";
-import { OpeningHoursList } from "./opening-hours";
+import { formatHoursRange } from "./opening-hours";
 
 const footerLink =
-  "inline-flex min-h-11 items-center gap-2 text-primary-foreground/85 underline-offset-4 transition-colors " +
-  "hover:text-primary-foreground hover:underline";
+  "inline-flex min-h-10 items-center gap-1.5 text-primary-foreground/80 underline-offset-4 transition-colors " +
+  "duration-200 hover:text-primary-foreground hover:underline";
 
+/**
+ * Brand and one booking action on top; pages, contact and visiting details in
+ * three short columns; legal line at the bottom.
+ */
 export function SiteFooter() {
   const { contact, navigation, features } = siteConfig;
   // Year in the clinic's time zone, so the footer never disagrees with IST.
@@ -19,109 +23,107 @@ export function SiteFooter() {
 
   return (
     <footer className="bg-primary text-primary-foreground">
-      <Container className="grid gap-10 py-16 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8 lg:py-20">
-        <div className="sm:col-span-2 lg:col-span-4 lg:pr-8">
-          <BrandWordmark tone="inverse" />
-          <p className="mt-5 max-w-sm text-sm leading-relaxed text-primary-foreground/75">
-            {siteConfig.description}
-          </p>
+      <Container className="py-16 lg:py-20">
+        <div className="flex flex-col gap-8 border-b border-primary-foreground/10 pb-12 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-md">
+            <BrandWordmark tone="inverse" />
+            <p className="mt-5 text-sm leading-relaxed text-primary-foreground/70">
+              {siteConfig.description}
+            </p>
+          </div>
+          <ButtonLink href={navigation.cta.href} className="self-start lg:self-auto">
+            {navigation.cta.label}
+          </ButtonLink>
         </div>
 
-        <FooterColumn title="Visit us" className="lg:col-span-3">
-          <address className="text-sm leading-relaxed text-primary-foreground/85 not-italic">
-            {formatAddressLines().map((line) => (
-              <span key={line} className="block">
-                {line}
-              </span>
-            ))}
-          </address>
-          <a
-            href={contact.mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(footerLink, "mt-2 text-sm")}
-          >
-            Get directions
-            <ArrowUpRight aria-hidden="true" className="size-4" />
-            <span className="sr-only">(opens in a new tab)</span>
-          </a>
-        </FooterColumn>
+        <div className="grid gap-10 pt-12 text-sm sm:grid-cols-3 lg:gap-16">
+          <FooterColumn title="Explore">
+            <nav aria-label="Footer">
+              <ul>
+                {navigation.footer.map((item) => (
+                  <li key={item.href}>
+                    <Link href={item.href} className={footerLink}>
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </FooterColumn>
 
-        <FooterColumn title="Contact" className="lg:col-span-3">
-          <ul className="text-sm">
-            <li>
-              <a href={`tel:${contact.phoneE164}`} className={footerLink}>
-                <Phone aria-hidden="true" className="size-4" />
-                {formatIndianPhone(contact.phoneE164)}
-              </a>
-            </li>
-            <li>
-              <a href={`mailto:${contact.email}`} className={cn(footerLink, "break-all")}>
-                <Mail aria-hidden="true" className="size-4 shrink-0" />
-                {contact.email}
-              </a>
-            </li>
-            {features.whatsapp && (
+          <FooterColumn title="Contact">
+            <ul>
               <li>
-                <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" className={footerLink}>
-                  <MessageCircle aria-hidden="true" className="size-4" />
-                  WhatsApp
-                  <span className="sr-only">(opens in a new tab)</span>
+                <a href={`tel:${contact.phoneE164}`} className={footerLink}>
+                  {formatIndianPhone(contact.phoneE164)}
                 </a>
               </li>
-            )}
-          </ul>
-        </FooterColumn>
+              <li>
+                <a href={`mailto:${contact.email}`} className={`${footerLink} break-all`}>
+                  {contact.email}
+                </a>
+              </li>
+              {features.whatsapp && (
+                <li>
+                  <a href={whatsappUrl()} target="_blank" rel="noopener noreferrer" className={footerLink}>
+                    WhatsApp
+                    <ArrowUpRight aria-hidden="true" className="size-3.5" />
+                    <span className="sr-only">(opens in a new tab)</span>
+                  </a>
+                </li>
+              )}
+            </ul>
+          </FooterColumn>
 
-        <FooterColumn title="Opening hours" className="lg:col-span-2">
-          <OpeningHoursList tone="inverse" />
-        </FooterColumn>
+          <FooterColumn title="Visit">
+            <address className="leading-relaxed text-primary-foreground/80 not-italic">
+              {formatAddressLines().map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
+            </address>
+            <dl className="mt-4 space-y-1">
+              {contact.hours.map((entry) => (
+                <div key={entry.label} className="flex flex-wrap gap-x-2">
+                  <dt className="text-primary-foreground/60">{entry.label}</dt>
+                  <dd className="text-primary-foreground/90">{formatHoursRange(entry)}</dd>
+                </div>
+              ))}
+            </dl>
+            <a
+              href={contact.mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${footerLink} mt-2`}
+            >
+              Get directions
+              <ArrowUpRight aria-hidden="true" className="size-3.5" />
+              <span className="sr-only">(opens in a new tab)</span>
+            </a>
+          </FooterColumn>
+        </div>
       </Container>
 
-      <div className="border-t border-primary-foreground/15">
-        <Container className="flex flex-col gap-2 py-4 text-sm lg:flex-row lg:items-center lg:justify-between">
-          <nav aria-label="Footer">
-            <ul className="flex flex-wrap gap-x-6">
-              {navigation.footer.map((item) => (
-                <li key={item.href}>
-                  <Link href={item.href} className={footerLink}>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <p className="py-3 text-primary-foreground/70">
+      <div className="border-t border-primary-foreground/10">
+        {/* Right padding keeps the text clear of the floating WhatsApp button. */}
+        <Container className="flex flex-col gap-1.5 py-6 pr-24 text-xs text-primary-foreground/60 sm:pr-24 lg:flex-row lg:justify-between lg:pr-24">
+          <p>
             © {year} {siteConfig.name}. All rights reserved.
           </p>
+          {features.demoNotice && (
+            <p>Demonstration website: {siteConfig.name} and the people shown are fictional.</p>
+          )}
         </Container>
       </div>
-
-      {features.demoNotice && (
-        <div className="bg-primary-hover">
-          <Container className="py-3 pr-20 sm:pr-6 lg:pr-8">
-            <p className="text-xs leading-relaxed text-primary-foreground/80">
-              Demonstration website: {siteConfig.name} and the people shown are fictional.
-            </p>
-          </Container>
-        </div>
-      )}
     </footer>
   );
 }
 
-function FooterColumn({
-  title,
-  className,
-  children,
-}: {
-  title: string;
-  className?: string;
-  children: ReactNode;
-}) {
+function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className={className}>
-      <h2 className="font-sans text-xs font-semibold tracking-[0.14em] text-primary-foreground/70 uppercase">
+    <div>
+      <h2 className="font-sans text-xs font-semibold tracking-[0.16em] text-primary-foreground/50 uppercase">
         {title}
       </h2>
       <div className="mt-4">{children}</div>

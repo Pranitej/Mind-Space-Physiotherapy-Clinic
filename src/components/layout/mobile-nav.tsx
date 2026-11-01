@@ -1,16 +1,15 @@
 "use client";
 
-import { Menu, Phone, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState, type FocusEvent } from "react";
-import { Button, ButtonLink, buttonClasses } from "@/components/ui/button";
+import { Button, ButtonLink, buttonArrowClasses } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { NavLinks, type NavItem } from "./nav-links";
 
 interface MobileNavProps {
   items: ReadonlyArray<NavItem>;
   cta: NavItem;
-  phone: { href: string; label: string };
 }
 
 /** Tailwind's `lg` breakpoint, where the desktop navigation takes over. */
@@ -21,8 +20,13 @@ const DESKTOP_MEDIA_QUERY = "(min-width: 64rem)";
  * aria-controls, Escape closes it and returns focus to the toggle, the page
  * behind does not scroll while it is open, and it closes on navigation or when
  * keyboard focus moves elsewhere on the page.
+ *
+ * The panel stays mounted and fades/slides between states rather than being
+ * toggled with `hidden`, so opening, closing and navigating all animate. While
+ * closed it is `inert` (unfocusable and hidden from assistive technology) and
+ * `invisible` once its exit transition ends.
  */
-export function MobileNav({ items, cta, phone }: MobileNavProps) {
+export function MobileNav({ items, cta }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const [lastPathname, setLastPathname] = useState(pathname);
@@ -72,6 +76,9 @@ export function MobileNav({ items, cta, phone }: MobileNavProps) {
     if (open && next instanceof Node && !event.currentTarget.contains(next)) close(false);
   };
 
+  const iconClasses =
+    "absolute inset-0 size-5 transition-[opacity,rotate,scale] duration-300 ease-out-soft motion-reduce:transition-none";
+
   return (
     <div className="lg:hidden" onBlur={onBlur}>
       <Button
@@ -80,29 +87,47 @@ export function MobileNav({ items, cta, phone }: MobileNavProps) {
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}
-        className="w-11 px-0"
+        className="group w-11 px-0 hover:translate-y-0"
       >
-        {open ? <X aria-hidden="true" className="size-5" /> : <Menu aria-hidden="true" className="size-5" />}
+        <span className="relative size-5">
+          <Menu
+            aria-hidden="true"
+            className={`${iconClasses} group-aria-expanded:scale-75 group-aria-expanded:rotate-90 group-aria-expanded:opacity-0`}
+          />
+          <X
+            aria-hidden="true"
+            className={`${iconClasses} scale-75 -rotate-90 opacity-0 group-aria-expanded:scale-100 group-aria-expanded:rotate-0 group-aria-expanded:opacity-100`}
+          />
+        </span>
         <span className="sr-only">Menu</span>
       </Button>
 
       <div
         id={panelId}
-        hidden={!open}
-        className="fixed inset-x-0 top-16 bottom-0 z-40 overflow-y-auto overscroll-contain border-t border-border bg-background"
+        data-open={open || undefined}
+        inert={!open}
+        className={
+          "group invisible fixed inset-x-0 top-16 bottom-0 z-40 -translate-y-2 overflow-y-auto overscroll-contain " +
+          "border-t border-border bg-background opacity-0 transition-[opacity,transform,visibility] duration-300 " +
+          "ease-out-soft data-open:visible data-open:translate-y-0 data-open:opacity-100 " +
+          "motion-reduce:translate-y-0 motion-reduce:transition-opacity"
+        }
       >
-        <Container className="py-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
+        <Container className="flex min-h-full flex-col py-6 pb-[max(2rem,env(safe-area-inset-bottom))]">
           <nav aria-label="Main">
             <NavLinks items={items} variant="mobile" onNavigate={() => close()} />
           </nav>
-          <div className="mt-8 grid gap-3">
-            <ButtonLink href={cta.href} size="lg" onClick={() => close()}>
+          <div
+            className={
+              "mt-10 translate-y-3 opacity-0 transition-[opacity,transform] delay-0 duration-500 ease-out-soft " +
+              "group-data-open:translate-y-0 group-data-open:opacity-100 group-data-open:delay-300 " +
+              "motion-reduce:translate-y-0"
+            }
+          >
+            <ButtonLink href={cta.href} size="lg" className="w-full" onClick={() => close()}>
               {cta.label}
+              <ArrowRight aria-hidden="true" className={buttonArrowClasses} />
             </ButtonLink>
-            <a href={phone.href} className={buttonClasses({ variant: "outline", size: "lg" })}>
-              <Phone aria-hidden="true" className="size-4" />
-              Call {phone.label}
-            </a>
           </div>
         </Container>
       </div>
