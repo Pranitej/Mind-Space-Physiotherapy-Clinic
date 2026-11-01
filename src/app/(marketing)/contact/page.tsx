@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
-import { ContactDetails } from "@/components/enquiry/contact-details";
+import { ClinicInfo, QuickContact } from "@/components/enquiry/contact-details";
 import { EnquiryForm } from "@/components/enquiry/enquiry-form";
+import { PageIntro } from "@/components/marketing/page-intro";
 import { Container } from "@/components/ui/container";
-import { SectionHeading } from "@/components/ui/section-heading";
 import { siteConfig } from "@/config/site.config";
 import { getPreferredDateRange, isEnquiryServiceSlug } from "@/lib/enquiries/enquiry.schema";
 import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildPageMetadata(siteConfig.pages.contact.seo, "/contact");
 
+/**
+ * One column, top to bottom: heading with direct contact options, the form,
+ * then visiting details. Nothing competes with the form for attention.
+ */
 export default async function ContactPage({ searchParams }: PageProps<"/contact">) {
   const { service } = await searchParams;
   // "Book" links on service pages pass ?service=<slug>. Anything that is not a
@@ -20,16 +24,17 @@ export default async function ContactPage({ searchParams }: PageProps<"/contact"
 
   return (
     <>
-      <div className="border-b border-border bg-primary-soft">
-        <Container className="py-12 sm:py-16">
-          <SectionHeading as="h1" eyebrow={`${locality}, ${city}`} title={title} subtitle={subtitle} />
-        </Container>
-      </div>
+      <PageIntro eyebrow={`${locality}, ${city}`} title={title} subtitle={subtitle} align="center">
+        <QuickContact />
+      </PageIntro>
 
-      <Container className="grid gap-10 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-12">
-        <EnquiryForm defaultService={defaultService} minDate={dateRange.min} maxDate={dateRange.max} />
-        <ContactDetails />
+      <Container className="py-14 sm:py-20">
+        <div className="mx-auto max-w-3xl">
+          <EnquiryForm defaultService={defaultService} minDate={dateRange.min} maxDate={dateRange.max} />
+        </div>
       </Container>
+
+      <ClinicInfo />
     </>
   );
 }

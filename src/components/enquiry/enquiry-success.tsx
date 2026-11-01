@@ -3,6 +3,7 @@
 import { CircleCheck } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { ButtonLink } from "@/components/ui/button";
+import { CopyButton } from "@/components/ui/copy-button";
 import { siteConfig } from "@/config/site.config";
 
 /** Replaces the form once the enquiry is saved. */
@@ -18,8 +19,12 @@ export function EnquirySuccess({ reference }: { reference: string }) {
   }, []);
 
   return (
-    <div className="rounded-3xl border border-border bg-surface p-6 text-center shadow-sm sm:p-10">
-      <CircleCheck aria-hidden="true" className="mx-auto size-12 text-success" strokeWidth={1.75} />
+    <div className="rounded-[2rem] border border-border bg-surface p-6 text-center shadow-lift motion-safe:animate-rise sm:p-10">
+      <CircleCheck
+        aria-hidden="true"
+        className="mx-auto size-12 text-success motion-safe:animate-pop motion-safe:[animation-delay:250ms]"
+        strokeWidth={1.75}
+      />
       <h2
         ref={headingRef}
         tabIndex={-1}
@@ -29,9 +34,15 @@ export function EnquirySuccess({ reference }: { reference: string }) {
       </h2>
       <p className="mx-auto mt-3 max-w-md leading-relaxed text-muted">{successMessage}</p>
 
-      <div className="mx-auto mt-6 max-w-xs rounded-2xl bg-primary-soft px-6 py-4">
-        <p className="text-sm text-muted">Your reference</p>
-        <p className="mt-1 font-mono text-xl font-semibold tracking-wider text-primary">{reference}</p>
+      <div className="mx-auto mt-6 flex max-w-sm items-center justify-between gap-4 rounded-2xl border border-primary/10 bg-primary-soft/60 py-4 pr-4 pl-5 text-left motion-safe:animate-fade-in motion-safe:[animation-delay:350ms]">
+        <div className="min-w-0">
+          <p className="text-sm text-muted">Your reference</p>
+          {/* select-all: one click selects the whole reference if copying to the clipboard is unavailable. */}
+          <p className="mt-1 font-mono text-xl font-semibold tracking-wider break-all text-primary select-all">
+            {reference}
+          </p>
+        </div>
+        <CopyButton value={reference} label="Copy reference" className="shrink-0" />
       </div>
 
       <p className="mt-6 text-sm text-muted">

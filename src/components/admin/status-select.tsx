@@ -66,8 +66,9 @@ export function StatusSelect({ enquiryId, reference, status, className }: Status
           aria-disabled={isPending || undefined}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            "h-11 w-full min-w-36 cursor-pointer appearance-none rounded-lg border py-2 pr-9 pl-3 text-sm font-semibold",
-            "transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
+            "h-11 w-full min-w-36 cursor-pointer appearance-none rounded-xl border py-2 pr-9 pl-3 text-sm font-semibold",
+            "transition-[border-color,box-shadow,background-color,color] duration-300 ease-smooth",
+            "focus:ring-4 focus:ring-primary/10 focus:outline-none",
             "aria-disabled:cursor-wait aria-disabled:opacity-70",
             toneClasses[statusTones[optimisticStatus]],
           )}

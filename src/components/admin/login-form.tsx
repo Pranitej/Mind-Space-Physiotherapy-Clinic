@@ -1,11 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle, LockKeyhole } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useId, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { ControlIcon, FieldError, controlClasses, controlWithIconClasses } from "@/components/ui/form-field";
 import { adminApi, describeLoginFailure } from "@/lib/admin/api-client";
 import { ADMIN_HOME_PATH } from "@/lib/admin/display";
 import { adminLoginSchema, type AdminLoginInput } from "@/lib/admin/schemas";
@@ -55,11 +56,15 @@ export function LoginForm({ className }: { className?: string }) {
       {/* Lets password managers save and fill the credential against a username. */}
       <input type="text" name="username" autoComplete="username" value="admin" readOnly hidden />
 
-      <div>
-        <label htmlFor={inputId} className="block text-sm font-semibold text-foreground">
+      <div className="group/field">
+        <label
+          htmlFor={inputId}
+          className="block text-sm font-semibold text-foreground transition-colors duration-300 group-focus-within/field:text-primary"
+        >
           Password
         </label>
-        <div className="relative mt-1.5">
+        <div className="relative mt-2">
+          <ControlIcon icon={LockKeyhole} />
           <input
             id={inputId}
             type={isPasswordVisible ? "text" : "password"}
@@ -70,11 +75,7 @@ export function LoginForm({ className }: { className?: string }) {
             required
             aria-invalid={isInvalid || undefined}
             aria-describedby={describedBy || undefined}
-            className={cn(
-              "h-12 w-full rounded-lg border bg-surface pr-12 pl-3 text-base text-foreground",
-              "focus-visible:outline-2 focus-visible:outline-offset-2",
-              isInvalid ? "border-danger" : "border-border hover:border-primary/40",
-            )}
+            className={cn(controlClasses, controlWithIconClasses, "pr-12")}
             {...register("password")}
           />
           <button
@@ -95,11 +96,9 @@ export function LoginForm({ className }: { className?: string }) {
             <span className="sr-only">Show password</span>
           </button>
         </div>
-        {fieldError && (
-          <p id={fieldErrorId} className="mt-1.5 text-sm font-medium text-danger">
-            {fieldError}
-          </p>
-        )}
+        <div className="mt-2">
+          <FieldError id={fieldErrorId} message={fieldError} />
+        </div>
       </div>
 
       <div>
