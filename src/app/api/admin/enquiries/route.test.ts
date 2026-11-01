@@ -52,14 +52,31 @@ describe("GET /api/admin/enquiries", () => {
     expect(listEnquiries).toHaveBeenCalledWith({ page: 1, status: "new" });
   });
 
-  it.each(["?page=0", "?page=two", "?status=archived", "?status=%24ne"])(
-    "rejects %s with 400",
-    async (query) => {
-      const response = await list(query);
+  it("passes search, filters and sort through, with the search trimmed", async () => {
+    await list("?q=%20priya%20&service=sports-injury&period=30d&sort=name-asc");
+    expect(listEnquiries).toHaveBeenCalledWith({
+      page: 1,
+      search: "priya",
+      service: "sports-injury",
+      period: "30d",
+      sort: "name-asc",
+    });
+  });
 
-      expect(response.status).toBe(400);
-      expect((await response.json()).error.code).toBe("VALIDATION_ERROR");
-      expect(listEnquiries).not.toHaveBeenCalled();
-    },
-  );
+  it.each([
+    "?page=0",
+    "?page=two",
+    "?status=archived",
+    "?status=%24ne",
+    "?sort=random",
+    "?period=1y",
+    "?service=unknown",
+    `?q=${"x".repeat(101)}`,
+  ])("rejects %s with 400", async (query) => {
+    const response = await list(query);
+
+    expect(response.status).toBe(400);
+    expect((await response.json()).error.code).toBe("VALIDATION_ERROR");
+    expect(listEnquiries).not.toHaveBeenCalled();
+  });
 });

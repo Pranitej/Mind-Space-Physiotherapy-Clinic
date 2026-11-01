@@ -1,5 +1,16 @@
 import { siteConfig } from "@/config/site.config";
 import type { EnquiryStatus, NotificationStatus, TimeSlotId } from "@/lib/enquiries/enquiry.types";
+import { DEFAULT_SORT, type EnquiryPeriod, type EnquirySort } from "./filters";
+
+/** Dashboard state as it appears in the URL. */
+export interface DashboardLinkQuery {
+  status?: EnquiryStatus;
+  q?: string;
+  service?: string;
+  period?: EnquiryPeriod;
+  sort?: EnquirySort;
+  page?: number;
+}
 
 /**
  * Pure presentation helpers for the admin dashboard. No React and no
@@ -54,13 +65,26 @@ export function truncateText(text: string, maxChars: number): string {
 /** Dashboard URL for a filter + page. Defaults are omitted so links stay canonical. */
 export function buildDashboardHref({
   status,
+  q,
+  service,
+  period,
+  sort = DEFAULT_SORT,
   page = 1,
-}: { status?: EnquiryStatus; page?: number } = {}): string {
+}: DashboardLinkQuery = {}): string {
   const params = new URLSearchParams();
   if (status) params.set("status", status);
+  if (q) params.set("q", q);
+  if (service) params.set("service", service);
+  if (period) params.set("period", period);
+  if (sort !== DEFAULT_SORT) params.set("sort", sort);
   if (page > 1) params.set("page", String(page));
   const query = params.toString();
   return query ? `${ADMIN_HOME_PATH}?${query}` : ADMIN_HOME_PATH;
+}
+
+/** Everything that can narrow the list down (sorting and paging only reorder it). */
+export function hasActiveFilters({ status, q, service, period }: DashboardLinkQuery): boolean {
+  return Boolean(status || q || service || period);
 }
 
 /** 1-based index range of the items shown, e.g. { from: 21, to: 40 }. */

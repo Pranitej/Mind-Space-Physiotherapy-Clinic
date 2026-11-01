@@ -90,6 +90,12 @@ shown in the admin. Without `RESEND_API_KEY` the system runs in **simulated emai
 2. `POST /api/admin/session`: rate-limited, scrypt-verified. It sets an 8-hour `__Host-` session cookie.
 3. The dashboard page calls `requireAdminPage()` before loading data, and the admin API routes verify the session themselves.
 4. Status changes call `PATCH /api/admin/enquiries/:id`, which updates optimistically in the UI, persists, then refreshes server data.
+5. Search, filters and sorting live in the URL (`?q=&status=&service=&period=&sort=&page=`), so every view can be
+   reloaded, bookmarked and shared, and works without JavaScript. The page and `GET /api/admin/enquiries` validate
+   them with the same schemas (the page falls back per field; the API answers 400). Search text is regex-escaped
+   and matched literally against name, email, reference and message, and against phone numbers by digits. These
+   unanchored regexes can't use an index, which is acceptable at a clinic's volume with 12-month retention; a
+   larger deployment would move to Atlas Search.
 
 ## Data model
 

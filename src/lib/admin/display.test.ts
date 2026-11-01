@@ -7,6 +7,7 @@ import {
   getPageRange,
   getStatusLabel,
   getTimeSlotLabel,
+  hasActiveFilters,
   isEnquiryStatus,
   truncateText,
 } from "./display";
@@ -60,6 +61,22 @@ describe("buildDashboardHref", () => {
     expect(buildDashboardHref({ status: "new" })).toBe("/admin?status=new");
     expect(buildDashboardHref({ page: 3 })).toBe("/admin?page=3");
     expect(buildDashboardHref({ status: "booked", page: 2 })).toBe("/admin?status=booked&page=2");
+  });
+
+  it("keeps search, filters and a non-default sort, and encodes the search", () => {
+    expect(
+      buildDashboardHref({ q: "Priya S", service: "sports-injury", period: "7d", sort: "name-asc", page: 2 }),
+    ).toBe("/admin?q=Priya+S&service=sports-injury&period=7d&sort=name-asc&page=2");
+    expect(buildDashboardHref({ sort: "newest" })).toBe("/admin");
+  });
+});
+
+describe("hasActiveFilters", () => {
+  it("counts narrowing filters but not sorting or paging", () => {
+    expect(hasActiveFilters({})).toBe(false);
+    expect(hasActiveFilters({ sort: "oldest", page: 4 })).toBe(false);
+    expect(hasActiveFilters({ q: "priya" })).toBe(true);
+    expect(hasActiveFilters({ period: "today" })).toBe(true);
   });
 });
 

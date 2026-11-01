@@ -1,8 +1,10 @@
 import "server-only";
 import { randomInt } from "node:crypto";
-import { MongoServerError, ObjectId, type Collection, type Filter } from "mongodb";
+import { MongoServerError, ObjectId, type Collection } from "mongodb";
 import { siteConfig } from "@/config/site.config";
+import type { EnquiryListFilters } from "@/lib/admin/filters";
 import { collections, getDb } from "@/lib/db/mongodb";
+import { NO_PREFERRED_DATE_FIELD, buildEnquiryFilter, buildSortStages, isNameSort } from "./enquiry.query";
 import type {
   EnquiryDocument,
   EnquiryDto,
@@ -122,31 +124,42 @@ export async function setNotificationStatus(
   await collection.updateOne({ _id: id }, { $set: { [`notifications.${channel}`]: status } });
 }
 
+/** Case-insensitive comparison for name sorts. */
+const NAME_COLLATION = { locale: "en", strength: 2 } as const;
+
+/** One page of enquiries matching the filters, in the requested order. */
 export async function listEnquiries({
   page = 1,
   pageSize = siteConfig.admin.pageSize,
-  status,
-}: {
-  page?: number;
-  pageSize?: number;
-  status?: EnquiryStatus;
-} = {}): Promise<EnquiryPage> {
+  ...filters
+}: EnquiryListFilters & { page?: number; pageSize?: number } = {}): Promise<EnquiryPage> {
   const collection = await getCollection();
-  const filter: Filter<EnquiryDocument> = status ? { status } : {};
   const safePage = Math.max(1, Math.floor(page));
 
-  const [total, docs] = await Promise.all([
-    collection.countDocuments(filter),
-    collection
-      .find(filter)
-      .sort({ createdAt: -1 })
-      .skip((safePage - 1) * pageSize)
-      .limit(pageSize)
-      .toArray(),
-  ]);
+  // One round trip: $facet returns the requested page and the total match count together.
+  const [result] = await collection
+    .aggregate<{ items: EnquiryDocument[]; total: { count: number }[] }>(
+      [
+        { $match: buildEnquiryFilter(filters) },
+        ...buildSortStages(filters.sort),
+        {
+          $facet: {
+            items: [
+              { $skip: (safePage - 1) * pageSize },
+              { $limit: pageSize },
+              { $project: { [NO_PREFERRED_DATE_FIELD]: 0 } },
+            ],
+            total: [{ $count: "count" }],
+          },
+        },
+      ],
+      isNameSort(filters.sort) ? { collation: NAME_COLLATION } : {},
+    )
+    .toArray();
 
+  const total = result?.total[0]?.count ?? 0;
   return {
-    items: docs.map(toEnquiryDto),
+    items: (result?.items ?? []).map(toEnquiryDto),
     total,
     page: safePage,
     pageSize,

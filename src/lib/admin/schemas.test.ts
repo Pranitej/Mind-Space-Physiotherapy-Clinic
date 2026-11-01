@@ -52,6 +52,31 @@ describe("enquiryListQuerySchema", () => {
     expect(result.success).toBe(false);
     expect(result.error?.issues[0]?.path).toEqual(["status"]);
   });
+
+  it("accepts a search, service, period and sort", () => {
+    expect(
+      enquiryListQuerySchema.parse({
+        q: "  Priya ",
+        service: "sports-injury",
+        period: "30d",
+        sort: "name-asc",
+      }),
+    ).toEqual({ page: 1, q: "Priya", service: "sports-injury", period: "30d", sort: "name-asc" });
+  });
+
+  it("treats a blank search as no search", () => {
+    expect(enquiryListQuerySchema.parse({ q: "   " })).toEqual({ page: 1, q: undefined });
+  });
+
+  it.each([
+    { q: "x".repeat(101) },
+    { service: "massage" },
+    { period: "1y" },
+    { sort: "random" },
+    { sort: { $natural: 1 } },
+  ])("rejects %j", (query) => {
+    expect(enquiryListQuerySchema.safeParse(query).success).toBe(false);
+  });
 });
 
 describe("enquiryStatusUpdateSchema", () => {
@@ -72,26 +97,54 @@ describe("parseDashboardSearchParams", () => {
     expect(parseDashboardSearchParams({ page: "2", status: "contacted" })).toEqual({
       page: 2,
       status: "contacted",
+      sort: "newest",
     });
+  });
+
+  it("reads a search, service, period and sort", () => {
+    expect(
+      parseDashboardSearchParams({
+        q: " 98765 ",
+        service: "back-neck-pain",
+        period: "today",
+        sort: "oldest",
+      }),
+    ).toEqual({ page: 1, q: "98765", service: "back-neck-pain", period: "today", sort: "oldest" });
   });
 
   it("falls back to defaults instead of throwing", () => {
-    expect(parseDashboardSearchParams({})).toEqual({ page: 1, status: undefined });
-    expect(parseDashboardSearchParams({ page: "zero", status: "nope" })).toEqual({
-      page: 1,
-      status: undefined,
-    });
+    expect(parseDashboardSearchParams({})).toEqual({ page: 1, sort: "newest" });
+    expect(
+      parseDashboardSearchParams({
+        page: "zero",
+        status: "nope",
+        service: "x",
+        period: "forever",
+        sort: "?",
+      }),
+    ).toEqual({ page: 1, status: undefined, service: undefined, period: undefined, sort: "newest" });
+  });
+
+  it("drops a search that is too long rather than erroring", () => {
+    expect(parseDashboardSearchParams({ q: "x".repeat(101) }).q).toBeUndefined();
   });
 
   it("falls back per field, keeping whichever value is valid", () => {
-    expect(parseDashboardSearchParams({ page: "-4", status: "new" })).toEqual({ page: 1, status: "new" });
-    expect(parseDashboardSearchParams({ page: "5", status: "nope" })).toEqual({ page: 5, status: undefined });
+    expect(parseDashboardSearchParams({ page: "-4", status: "new" })).toEqual({
+      page: 1,
+      status: "new",
+      sort: "newest",
+    });
+    expect(parseDashboardSearchParams({ page: "5", status: "nope", sort: "name-desc" })).toEqual({
+      page: 5,
+      status: undefined,
+      sort: "name-desc",
+    });
   });
 
   it("ignores repeated parameters (arrays)", () => {
-    expect(parseDashboardSearchParams({ page: ["2", "3"], status: ["new", "booked"] })).toEqual({
-      page: 1,
-      status: undefined,
-    });
+    expect(
+      parseDashboardSearchParams({ page: ["2", "3"], status: ["new", "booked"], q: ["a", "b"] }),
+    ).toEqual({ page: 1, status: undefined, q: undefined, sort: "newest" });
   });
 });

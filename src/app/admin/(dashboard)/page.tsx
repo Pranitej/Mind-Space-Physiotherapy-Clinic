@@ -1,21 +1,24 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { ActiveFilters } from "@/components/admin/active-filters";
 import { EmptyState } from "@/components/admin/empty-state";
 import { EnquiryCardList } from "@/components/admin/enquiry-card-list";
 import { EnquirySummary } from "@/components/admin/enquiry-summary";
 import { EnquiryTable } from "@/components/admin/enquiry-table";
+import { EnquiryToolbar } from "@/components/admin/enquiry-toolbar";
 import { ErrorPanel } from "@/components/admin/error-panel";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { Pagination } from "@/components/admin/pagination";
 import { RefreshButton } from "@/components/admin/refresh-button";
-import { StatusFilter } from "@/components/admin/status-filter";
 import {
   buildDashboardHref,
   describeResults,
   getClinicTimeZoneName,
   getPageRange,
   getStatusLabel,
+  hasActiveFilters,
 } from "@/lib/admin/display";
+import { getSortLabel } from "@/lib/admin/filters";
 import { parseDashboardSearchParams, type DashboardQuery } from "@/lib/admin/schemas";
 import { requireAdminPage } from "@/lib/auth/dal";
 import { countEnquiriesByStatus, listEnquiries } from "@/lib/enquiries/enquiry.repository";
@@ -29,15 +32,16 @@ export const metadata: Metadata = {
 type DashboardData = { ok: true; enquiries: EnquiryPage; counts: EnquiryStatusCounts } | { ok: false };
 
 /** A database failure becomes an inline panel (and a log entry) instead of a crashed page. */
-async function loadDashboardData({ page, status }: DashboardQuery): Promise<DashboardData> {
+async function loadDashboardData({ q, ...query }: DashboardQuery): Promise<DashboardData> {
   try {
     const [enquiries, counts] = await Promise.all([
-      listEnquiries({ page, status }),
+      listEnquiries({ ...query, search: q }),
       countEnquiriesByStatus(),
     ]);
     return { ok: true, enquiries, counts };
   } catch (error) {
-    logger.error("admin.dashboard_load_failed", { error, page, status });
+    // The search text is left out of the log: it can contain a patient's name or number.
+    logger.error("admin.dashboard_load_failed", { error, page: query.page, status: query.status });
     return { ok: false };
   }
 }
@@ -51,14 +55,14 @@ export default async function AdminDashboardPage({ searchParams }: PageProps<"/a
 
   // Past the end, e.g. the only row on the last page just changed status out of this filter.
   if (data.ok && data.enquiries.total > 0 && query.page > data.enquiries.pageCount) {
-    redirect(buildDashboardHref({ status: query.status, page: data.enquiries.pageCount }));
+    redirect(buildDashboardHref({ ...query, page: data.enquiries.pageCount }));
   }
 
   return (
     <>
       <AdminPageHeader
         title="Enquiries"
-        description={`Appointment requests from the website, newest first. Times are ${getClinicTimeZoneName()}.`}
+        description={`Appointment requests from the website. Times are ${getClinicTimeZoneName()}.`}
       />
       {data.ok ? (
         <DashboardContent query={query} enquiries={data.enquiries} counts={data.counts} />
@@ -79,49 +83,59 @@ interface DashboardContentProps {
   counts: EnquiryStatusCounts;
 }
 
-function DashboardContent({ query: { status }, enquiries, counts }: DashboardContentProps) {
+function DashboardContent({ query, enquiries, counts }: DashboardContentProps) {
   const { items, page, pageCount, pageSize, total } = enquiries;
-  const statusLabel = status ? getStatusLabel(status) : undefined;
+  const statusLabel = query.status ? getStatusLabel(query.status) : undefined;
   const summary = describeResults({ ...getPageRange({ page, pageSize, total }), total, statusLabel });
+  const filtered = hasActiveFilters(query);
 
   return (
     <div className="space-y-6">
-      <EnquirySummary counts={counts} />
+      <EnquirySummary counts={counts} query={query} />
 
       <section aria-labelledby="enquiry-list-heading" className="space-y-4">
         <h2 id="enquiry-list-heading" className="sr-only">
           Enquiry list
         </h2>
+
+        <EnquiryToolbar query={query} />
+
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <StatusFilter active={status} />
-          {/* Announces the new result count after a filter or page change. */}
-          <p aria-live="polite" className="text-sm font-medium text-muted tabular-nums">
+          <ActiveFilters query={query} />
+          {/* Announces the new result count after a search, filter or page change. */}
+          <p aria-live="polite" className="text-sm font-medium text-muted tabular-nums lg:ml-auto">
             {summary}
+            {total > 0 && <span className="text-muted/80"> · {getSortLabel(query.sort)}</span>}
           </p>
         </div>
 
         {items.length === 0 ? (
           <EmptyState
-            title={statusLabel ? `No ${statusLabel.toLowerCase()} enquiries` : "No enquiries yet"}
+            title={filtered ? "No enquiries match" : "No enquiries yet"}
             description={
-              statusLabel
-                ? "Nothing has this status at the moment."
+              filtered
+                ? "Try a different search, or remove a filter to see more enquiries."
                 : "New enquiries from the website's booking form will appear here as soon as they arrive."
             }
-            action={statusLabel ? { label: "View all enquiries", href: buildDashboardHref() } : undefined}
+            action={
+              filtered
+                ? { label: "Clear search and filters", href: buildDashboardHref({ sort: query.sort }) }
+                : undefined
+            }
           />
         ) : (
           <>
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <EnquiryTable
                 enquiries={items}
-                caption={`${summary}, newest first. Page ${page} of ${pageCount}.`}
+                query={query}
+                caption={`${summary}, ${getSortLabel(query.sort).toLowerCase()}. Page ${page} of ${pageCount}.`}
               />
             </div>
-            <div className="md:hidden">
-              <EnquiryCardList enquiries={items} />
+            <div className="lg:hidden">
+              <EnquiryCardList enquiries={items} term={query.q} />
             </div>
-            <Pagination page={page} pageCount={pageCount} status={status} />
+            <Pagination page={page} pageCount={pageCount} query={query} />
           </>
         )}
       </section>

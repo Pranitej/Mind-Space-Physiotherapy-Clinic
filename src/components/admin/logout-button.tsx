@@ -28,9 +28,15 @@ export function LogoutButton() {
 
   return (
     <div className="relative">
-      <Button variant="outline" size="sm" className="h-11" onClick={handleClick} disabled={isPending}>
+      <Button
+        variant="outline"
+        size="sm"
+        className="h-11 px-3 sm:px-4"
+        onClick={handleClick}
+        disabled={isPending}
+      >
         <LogOut aria-hidden="true" className="size-4" />
-        {isPending ? "Signing out…" : "Sign out"}
+        <span className="sr-only sm:not-sr-only">{isPending ? "Signing out…" : "Sign out"}</span>
       </Button>
       {error && (
         <p

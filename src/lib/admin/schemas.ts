@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { siteConfig } from "@/config/site.config";
+import { DEFAULT_SORT, SEARCH_MAX_LENGTH, periodOptions, serviceFilterOptions, sortOptions } from "./filters";
 
 /**
  * Validation for every input the admin area accepts. Shared by the route
@@ -34,10 +35,36 @@ export const adminLoginSchema = z.object({
 
 export type AdminLoginInput = z.input<typeof adminLoginSchema>;
 
+/** Free-text search: trimmed and capped; an empty box means "no search". */
+const searchSchema = z
+  .string("Search must be text.")
+  .trim()
+  .max(SEARCH_MAX_LENGTH, `Search must be ${SEARCH_MAX_LENGTH} characters or fewer.`)
+  .transform((value) => value || undefined);
+
+const serviceSchema = z.enum(
+  serviceFilterOptions.map((option) => option.slug),
+  "Choose a valid service.",
+);
+
+const periodSchema = z.enum(
+  periodOptions.map((option) => option.id),
+  "Choose a valid period.",
+);
+
+const sortSchema = z.enum(
+  sortOptions.map((option) => option.id),
+  "Choose a valid sort order.",
+);
+
 /** Query of `GET /api/admin/enquiries`. Strict: malformed input is a 400, never silently "fixed". */
 export const enquiryListQuerySchema = z.object({
   page: pageSchema.default(1),
   status: enquiryStatusSchema.optional(),
+  q: searchSchema.optional(),
+  service: serviceSchema.optional(),
+  period: periodSchema.optional(),
+  sort: sortSchema.optional(),
 });
 
 /** Body of `PATCH /api/admin/enquiries/[id]`. */
@@ -53,6 +80,10 @@ export const enquiryStatusUpdateSchema = z.object({
 const dashboardSearchParamsSchema = z.object({
   page: pageSchema.catch(1),
   status: enquiryStatusSchema.optional().catch(undefined),
+  q: searchSchema.optional().catch(undefined),
+  service: serviceSchema.optional().catch(undefined),
+  period: periodSchema.optional().catch(undefined),
+  sort: sortSchema.catch(DEFAULT_SORT),
 });
 
 export type DashboardQuery = z.output<typeof dashboardSearchParamsSchema>;
