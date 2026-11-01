@@ -18,21 +18,55 @@ export function SectionHeading({
   as: Heading = "h2",
   className,
 }: SectionHeadingProps) {
+  const centered = align === "center";
+
   return (
-    <div className={cn("max-w-2xl", align === "center" && "mx-auto text-center", className)}>
-      {eyebrow && (
-        // Primary, not accent: the accent colour is reserved for booking actions.
-        <p className="mb-3 text-sm font-semibold tracking-wide text-primary uppercase">{eyebrow}</p>
-      )}
+    <div className={cn("max-w-2xl", centered && "mx-auto text-center", className)}>
+      {eyebrow && <Eyebrow centered={centered}>{eyebrow}</Eyebrow>}
       <Heading
         className={cn(
-          "font-display text-primary",
-          Heading === "h1" ? "text-4xl sm:text-5xl" : "text-3xl sm:text-4xl",
+          "font-display leading-[1.1] tracking-[-0.02em] text-primary",
+          Heading === "h1"
+            ? "text-4xl sm:text-5xl lg:text-[3.5rem]"
+            : "text-3xl sm:text-4xl lg:text-[2.75rem]",
         )}
       >
         {title}
       </Heading>
-      {subtitle && <p className="mt-4 text-lg leading-relaxed text-muted">{subtitle}</p>}
+      {subtitle && (
+        <p className={cn("mt-5 max-w-xl text-lg leading-relaxed text-muted", centered && "mx-auto")}>
+          {subtitle}
+        </p>
+      )}
     </div>
+  );
+}
+
+/** Small label above a heading. Primary, not accent: the accent colour is reserved for booking actions. */
+export function Eyebrow({
+  children,
+  centered = false,
+  tone = "default",
+}: {
+  children: string;
+  centered?: boolean;
+  tone?: "default" | "inverse";
+}) {
+  const inverse = tone === "inverse";
+
+  return (
+    <p
+      className={cn(
+        "mb-4 flex items-center gap-3 text-xs font-semibold tracking-[0.16em] uppercase",
+        inverse ? "text-primary-foreground/70" : "text-primary",
+        centered && "justify-center",
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className={cn("h-px w-6", inverse ? "bg-primary-foreground/40" : "bg-primary/40")}
+      />
+      {children}
+    </p>
   );
 }
