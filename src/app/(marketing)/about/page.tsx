@@ -15,7 +15,7 @@ export default function AboutPage() {
 
   return (
     <>
-      <PageIntro title={title} subtitle={intro} />
+      <PageIntro eyebrow="About us" title={title} subtitle={intro} />
       <ClinicStory />
       <ValuesGrid />
       <TeamGrid />

@@ -2,6 +2,7 @@ import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { siteConfig } from "@/config/site.config";
 import type { TeamMember } from "@/config/types";
+import { revealDelay } from "@/lib/motion";
 import { getInitials } from "./initials";
 
 /**
@@ -14,13 +15,16 @@ export function TeamGrid() {
   return (
     <section>
       <Container className="py-20 lg:py-28">
-        <SectionHeading
-          title="Meet the team"
-          subtitle={`${team.length} specialist physiotherapists. Every session is with one of them, from first assessment to discharge.`}
-        />
-        <ul className="mt-12 grid gap-6 md:grid-cols-2">
-          {team.map((member) => (
-            <li key={member.name}>
+        <div data-reveal>
+          <SectionHeading
+            eyebrow="Our team"
+            title="Meet the team"
+            subtitle={`${team.length} specialist physiotherapists. Every session is with one of them, from first assessment to discharge.`}
+          />
+        </div>
+        <ul className="mt-14 grid gap-6 md:grid-cols-2">
+          {team.map((member, index) => (
+            <li key={member.name} data-reveal style={revealDelay(index % 2)}>
               <TeamCard member={member} />
             </li>
           ))}
@@ -32,15 +36,20 @@ export function TeamGrid() {
 
 function TeamCard({ member }: { member: TeamMember }) {
   return (
-    <article className="flex h-full flex-col gap-6 rounded-3xl border border-border bg-surface p-6 sm:flex-row sm:p-8">
+    <article
+      className={
+        "group card-lift flex h-full flex-col gap-6 rounded-3xl border border-border bg-surface p-6 shadow-soft " +
+        "sm:flex-row sm:p-8"
+      }
+    >
       <span
         aria-hidden="true"
-        className="grid size-16 shrink-0 place-items-center rounded-full bg-primary-soft font-display text-xl text-primary ring-1 ring-primary/10"
+        className="grid size-16 shrink-0 place-items-center rounded-2xl bg-primary-soft font-display text-xl text-primary ring-1 ring-primary/10 transition-colors duration-500 ease-smooth group-hover:bg-primary group-hover:text-primary-foreground"
       >
         {getInitials(member.name)}
       </span>
       <div className="flex flex-1 flex-col">
-        <h3 className="font-display text-2xl text-primary">{member.name}</h3>
+        <h3 className="font-display text-2xl tracking-tight text-primary">{member.name}</h3>
         <p className="mt-1 font-semibold text-foreground">{member.role}</p>
         <p className="mt-1 text-sm text-muted">
           {member.qualifications} · {member.experienceYears} years’ experience

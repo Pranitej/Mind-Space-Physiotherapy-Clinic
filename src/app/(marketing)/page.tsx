@@ -16,7 +16,7 @@ export default function HomePage() {
   return (
     <>
       <HomeHero />
-      <StatsBand className="pt-6" />
+      <StatsBand />
       <FeaturedServices />
       <ApproachSection />
       <ProcessSteps />

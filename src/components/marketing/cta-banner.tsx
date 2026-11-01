@@ -1,5 +1,5 @@
-import { Phone } from "lucide-react";
-import { ButtonLink, buttonClasses } from "@/components/ui/button";
+import { ArrowRight, Phone } from "lucide-react";
+import { ButtonLink, buttonArrowClasses, buttonClasses } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { siteConfig } from "@/config/site.config";
 import { formatIndianPhone } from "@/lib/format";
@@ -29,15 +29,21 @@ export function CtaBanner({
   return (
     <section className={cn("pb-20 lg:pb-28", className)}>
       <Container>
-        <div className="relative isolate overflow-hidden rounded-4xl border border-primary/10 bg-primary-soft px-6 py-12 sm:px-12 sm:py-16 lg:flex lg:items-center lg:justify-between lg:gap-12 lg:px-16">
+        <div
+          data-reveal
+          className="relative isolate overflow-hidden rounded-[2rem] border border-primary/10 bg-primary-soft px-6 py-12 sm:px-12 sm:py-16 lg:flex lg:items-center lg:justify-between lg:gap-12 lg:px-16"
+        >
           <Ripples />
           <div className="max-w-xl">
-            <h2 className="font-display text-3xl text-primary sm:text-4xl">{title}</h2>
+            <h2 className="font-display text-3xl leading-[1.1] tracking-[-0.02em] text-primary sm:text-4xl">
+              {title}
+            </h2>
             <p className="mt-4 text-lg leading-relaxed text-muted">{subtitle}</p>
           </div>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row lg:mt-0 lg:shrink-0">
             <ButtonLink href={cta.href} size="lg">
               {cta.label}
+              <ArrowRight aria-hidden="true" className={buttonArrowClasses} />
             </ButtonLink>
             <a href={`tel:${phoneE164}`} className={buttonClasses({ variant: "outline", size: "lg" })}>
               <Phone aria-hidden="true" className="size-4" />

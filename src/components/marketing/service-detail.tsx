@@ -12,7 +12,8 @@ export function ServiceDetail({ service, index }: { service: Service; index: num
     <section
       id={service.slug}
       aria-labelledby={headingId}
-      className="grid scroll-mt-6 gap-8 rounded-3xl border border-border bg-surface p-6 sm:p-10 lg:grid-cols-12 lg:gap-12"
+      data-reveal
+      className="grid scroll-mt-6 gap-8 rounded-3xl border border-border bg-surface p-6 shadow-soft sm:p-10 lg:grid-cols-12 lg:gap-12"
     >
       <div className="lg:col-span-8">
         <div className="flex items-center gap-4">
@@ -23,12 +24,12 @@ export function ServiceDetail({ service, index }: { service: Service; index: num
             {String(index + 1).padStart(2, "0")}
           </span>
         </div>
-        <h2 id={headingId} className="mt-6 font-display text-3xl text-primary">
+        <h2 id={headingId} className="mt-6 font-display text-3xl tracking-tight text-primary">
           {service.name}
         </h2>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted">{service.description}</p>
 
-        <h3 className="mt-8 font-sans text-sm font-semibold tracking-wide text-foreground uppercase">
+        <h3 className="mt-8 font-sans text-xs font-semibold tracking-[0.16em] text-muted uppercase">
           Ideal for
         </h3>
         <ul className="mt-4 grid gap-3 sm:grid-cols-2">

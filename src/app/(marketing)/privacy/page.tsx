@@ -263,7 +263,7 @@ export default function PrivacyPage() {
 
   return (
     <>
-      <PageIntro title={seo.title} subtitle={seo.description}>
+      <PageIntro eyebrow="Legal" title={seo.title} subtitle={seo.description}>
         <p className="mt-6 text-sm text-muted">
           Last updated <time dateTime={lastUpdated}>{formatCalendarDate(lastUpdated)}</time>
         </p>
@@ -271,7 +271,7 @@ export default function PrivacyPage() {
 
       <Container className="grid gap-12 py-16 lg:grid-cols-12 lg:gap-16 lg:py-24">
         <nav aria-label="On this page" className="lg:col-span-4">
-          <div className="rounded-3xl border border-border bg-surface p-6 lg:sticky lg:top-28">
+          <div className="rounded-3xl border border-border bg-surface p-6 shadow-soft lg:sticky lg:top-28">
             <p className="text-xs font-semibold tracking-[0.14em] text-muted uppercase">On this page</p>
             <ol className="mt-3 text-sm">
               {sections.map((section) => (
@@ -296,7 +296,7 @@ export default function PrivacyPage() {
               aria-labelledby={`${section.id}-title`}
               className="scroll-mt-6"
             >
-              <h2 id={`${section.id}-title`} className="font-display text-2xl text-primary">
+              <h2 id={`${section.id}-title`} className="font-display text-2xl tracking-tight text-primary">
                 {section.title}
               </h2>
               <div className="mt-4 space-y-4 leading-relaxed text-foreground/85">{section.body}</div>

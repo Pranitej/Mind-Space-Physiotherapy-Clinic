@@ -23,7 +23,7 @@ export default async function ServicesPage() {
 
   return (
     <>
-      <PageIntro title={title} subtitle={subtitle}>
+      <PageIntro eyebrow="Services & fees" title={title} subtitle={subtitle}>
         <ServiceJumpList />
       </PageIntro>
 
@@ -33,7 +33,10 @@ export default async function ServicesPage() {
             <ServiceDetail key={service.slug} service={service} index={index} />
           ))}
         </div>
-        <p className="mt-8 flex gap-3 rounded-2xl border border-border bg-surface p-5 text-sm leading-relaxed text-muted sm:p-6">
+        <p
+          data-reveal
+          className="mt-8 flex gap-3 rounded-2xl border border-border bg-surface p-5 text-sm leading-relaxed text-muted sm:p-6"
+        >
           <Info aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-primary" />
           {pricingNote}
         </p>
@@ -41,8 +44,9 @@ export default async function ServicesPage() {
 
       <section id={FAQ_SECTION_ID} className="scroll-mt-6 border-y border-border bg-surface">
         <Container className="grid gap-10 py-20 lg:grid-cols-12 lg:gap-16 lg:py-28">
-          <div className="lg:col-span-4">
+          <div data-reveal className="lg:col-span-4">
             <SectionHeading
+              eyebrow="FAQs"
               title="Frequently asked questions"
               subtitle="Straight answers about booking, your first visit and paying for treatment."
             />

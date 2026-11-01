@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Container } from "@/components/ui/container";
+import { SectionHeading } from "@/components/ui/section-heading";
 import { siteConfig } from "@/config/site.config";
 
 /** About page: the clinic's story beside a photo of a treatment room. */
@@ -10,9 +11,9 @@ export function ClinicStory() {
 
   return (
     <section>
-      <Container className="grid items-center gap-12 py-20 lg:grid-cols-12 lg:gap-20 lg:py-28">
-        <div className="lg:col-span-6">
-          <h2 className="font-display text-3xl text-primary sm:text-4xl">Our story</h2>
+      <Container className="grid items-center gap-14 py-20 lg:grid-cols-12 lg:gap-20 lg:py-28">
+        <div data-reveal className="lg:col-span-6">
+          <SectionHeading eyebrow={`Since ${siteConfig.foundedYear}`} title="Our story" />
           <div className="mt-6 space-y-5 text-lg leading-relaxed text-muted">
             {story.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
@@ -20,12 +21,12 @@ export function ClinicStory() {
           </div>
         </div>
 
-        <div className="relative lg:col-span-6">
+        <div data-reveal className="relative lg:col-span-6">
           <div
             aria-hidden="true"
-            className="absolute -top-6 -left-6 -z-10 hidden size-48 rounded-full border border-primary/15 lg:block"
+            className="absolute inset-0 translate-x-4 translate-y-4 rounded-[2rem] border border-primary/15 sm:translate-x-5 sm:translate-y-5"
           />
-          <div className="aspect-3/2 overflow-hidden rounded-4xl border border-border bg-primary-soft">
+          <div className="relative aspect-3/2 overflow-hidden rounded-[2rem] bg-primary-soft shadow-lift">
             <Image
               src={image.src}
               alt={image.alt}
@@ -35,7 +36,7 @@ export function ClinicStory() {
               className="size-full object-cover"
             />
           </div>
-          <p className="absolute right-4 -bottom-6 rounded-2xl border border-border bg-surface px-5 py-4 sm:right-6">
+          <p className="absolute right-4 -bottom-6 rounded-2xl border border-white/60 bg-surface/90 px-5 py-4 shadow-lift backdrop-blur-md sm:right-8">
             <span className="block text-xs font-semibold tracking-wide text-muted uppercase">
               {locality}, {city}
             </span>
