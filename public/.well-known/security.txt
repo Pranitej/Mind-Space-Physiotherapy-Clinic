@@ -1,9 +1,9 @@
-# Security contact for MindSpace Therapy Centre (RFC 9116).
+# Security contact for Mind Space Physiotherapy Clinic (RFC 9116).
 # Please report vulnerabilities privately to the address below; do not include patient data in reports.
 #
 # Keep in sync with siteConfig.contact.email (src/config/site.config.ts) and renew "Expires" yearly.
-# Canonical: add "Canonical: https://<production-domain>/.well-known/security.txt" once the domain is final.
 
 Contact: mailto:care@mindspacetherapy.in
 Expires: 2027-11-01T00:00:00.000Z
 Preferred-Languages: en
+Canonical: https://mind-space-physiotherapy-clinic.vercel.app/.well-known/security.txt

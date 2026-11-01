@@ -4,7 +4,7 @@ All photographs are from [Unsplash](https://unsplash.com) and used under the
 [Unsplash License](https://unsplash.com/license): free for commercial and non-commercial use, no
 permission or attribution required. We credit the photographers anyway.
 
-The people shown are models in stock photography. They are not MindSpace Therapy Centre staff or
+The people shown are models in stock photography. They are not Mind Space Physiotherapy Clinic staff or
 patients (the clinic itself is fictional). Team members on the About page are shown as initials, never
 as stock photos, so that no real person appears to be a member of staff.
 
