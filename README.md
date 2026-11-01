@@ -1,4 +1,4 @@
-# MindSpace Therapy Centre — clinic website
+# Mind Space Physiotherapy Clinic — clinic website
 
 A production-grade website for a (fictional) physiotherapy clinic in Jubilee Hills, Hyderabad: marketing
 pages, an online enquiry/booking form backed by MongoDB with confirmation emails, and a password-protected

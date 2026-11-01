@@ -59,7 +59,7 @@ export default function OpengraphImage() {
           backgroundColor: colors.primary,
         }}
       >
-        <BrandMarkImg size={260} markColor={colors.background} backgroundColor={null} />
+        <BrandMarkImg size={260} inverse backgroundColor={null} />
       </div>
     </div>,
     size,

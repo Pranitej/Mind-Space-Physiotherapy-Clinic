@@ -32,8 +32,10 @@ import type {
  */
 
 const brand = {
-  name: "MindSpace Therapy Centre",
-  shortName: "MindSpace",
+  name: "Mind Space Physiotherapy Clinic",
+  shortName: "Mind Space",
+  /** Second line of the logo lockup, under the short name. */
+  descriptor: "Physiotherapy Clinic",
   tagline: "Physiotherapy & Rehabilitation",
   description:
     "Evidence-based physiotherapy in Hyderabad for back and neck pain, sports injuries, post-surgery rehabilitation and more. One-to-one sessions with experienced physiotherapists.",
@@ -166,7 +168,7 @@ const team: TeamMember[] = [
     role: "Founder & Clinical Director",
     qualifications: "MPT (Orthopaedics)",
     experienceYears: 14,
-    bio: "Ananya founded MindSpace to offer unhurried, one-to-one physiotherapy. She leads our spine and post-surgery programmes.",
+    bio: "Ananya founded Mind Space to offer unhurried, one-to-one physiotherapy. She leads our spine and post-surgery programmes.",
     specialities: ["Spine care", "Post-surgery rehab", "Manual therapy"],
   },
   {
@@ -269,6 +271,16 @@ const values: Value[] = [
   },
 ];
 
+/**
+ * The clinic's emblem, cut from the supplied logo artwork as transparent PNGs:
+ * teal for light backgrounds, white for the dark footer.
+ */
+const logo = {
+  mark: "/brand/logo-mark.png",
+  markInverse: "/brand/logo-mark-inverse.png",
+  size: 256,
+} as const;
+
 /** Photo credits and licences: public/images/CREDITS.md. */
 const images = {
   hero: {
@@ -315,7 +327,7 @@ const pages = {
         "Expert one-to-one physiotherapy in Jubilee Hills, Hyderabad for back pain, sports injuries and post-surgery rehab. Book an assessment online today.",
     },
     hero: {
-      eyebrow: "Physiotherapy & Rehabilitation · Jubilee Hills, Hyderabad",
+      eyebrow: `Physiotherapy in ${contact.address.locality}, ${contact.address.city}`,
       title: "Move freely. Live without pain.",
       subtitle:
         "One-to-one physiotherapy from specialists who take the time to find the cause of your pain — and build a plan that gets you back to the life you love.",
@@ -354,12 +366,10 @@ const pages = {
   about: {
     seo: {
       title: "About Our Clinic & Physiotherapists",
-      description:
-        "Meet the experienced physiotherapists at MindSpace Therapy Centre, Jubilee Hills. Learn about our evidence-based, one-to-one approach to rehabilitation.",
+      description: `Meet the experienced physiotherapists at ${brand.name}, Jubilee Hills. Learn about our evidence-based, one-to-one approach to rehabilitation.`,
     },
     title: "Care that takes its time",
-    intro:
-      "MindSpace Therapy Centre was founded in 2014 with a simple idea: people recover faster when they are listened to. Every session is one-to-one, every plan is personal, and every patient leaves understanding their body a little better.",
+    intro: `${brand.name} was founded in ${brand.foundedYear} with a simple idea: people recover faster when they are listened to. Every session is one-to-one, every plan is personal, and every patient leaves understanding their body a little better.`,
     story: [
       "We started as a two-room clinic in Jubilee Hills with a single treatment table. Today our team of four specialist physiotherapists sees patients from across Hyderabad — office workers with back pain, weekend athletes, new mothers and people rebuilding their lives after surgery or stroke.",
       "What hasn't changed is how we work. We give every patient the time a proper assessment needs, explain what we find in plain language, and measure progress so you can see it too.",
@@ -380,8 +390,7 @@ const pages = {
   privacy: {
     seo: {
       title: "Privacy Policy",
-      description:
-        "How MindSpace Therapy Centre collects, uses and protects the personal data you share with us, in line with India's Digital Personal Data Protection Act, 2023.",
+      description: `How ${brand.name} collects, uses and protects the personal data you share with us, in line with India's Digital Personal Data Protection Act, 2023.`,
     },
     lastUpdated: "2026-11-01",
   },
@@ -494,6 +503,7 @@ export const siteConfig = {
   faqs,
   stats,
   values,
+  logo,
   images,
   navigation,
   pages,

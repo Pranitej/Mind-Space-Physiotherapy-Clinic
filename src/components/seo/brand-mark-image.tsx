@@ -1,11 +1,34 @@
 import { ImageResponse } from "next/og";
-import { brandMarkDataUri, type BrandMarkOptions } from "./brand-mark";
+import { siteConfig } from "@/config/site.config";
+import { brandEmblemDataUri, type BrandMarkOptions } from "./brand-mark";
 
 /** The brand mark as an element for `ImageResponse` (Satori) layouts. */
-export function BrandMarkImg({ size, ...mark }: BrandMarkOptions & { size: number }) {
-  // Satori renders plain <img>; next/image does not apply inside ImageResponse.
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src={brandMarkDataUri(mark)} width={size} height={size} alt="" />;
+export function BrandMarkImg({
+  size,
+  scale = 1,
+  cornerRadius = 0,
+  inverse = false,
+  backgroundColor = siteConfig.theme.colors.background,
+}: BrandMarkOptions & { size: number }) {
+  const emblemSize = Math.round(size * scale);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: size,
+        height: size,
+        borderRadius: Math.round(size * cornerRadius),
+        backgroundColor: backgroundColor ?? "transparent",
+      }}
+    >
+      {/* Satori renders plain <img>; next/image does not apply inside ImageResponse. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={brandEmblemDataUri(inverse)} width={emblemSize} height={emblemSize} alt="" />
+    </div>
+  );
 }
 
 /** Renders the brand mark as a square PNG of `size` pixels. */

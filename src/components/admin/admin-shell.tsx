@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { buttonClasses } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { BrandLogoMark } from "@/components/layout/brand-wordmark";
 import { siteConfig } from "@/config/site.config";
 import { ADMIN_HOME_PATH } from "@/lib/admin/display";
 import { LogoutButton } from "./logout-button";
@@ -24,11 +25,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <Container className="flex h-16 max-w-7xl items-center justify-between gap-3">
           <Link
             href={ADMIN_HOME_PATH}
-            className="flex min-h-11 items-center gap-2.5 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="flex min-h-11 min-w-0 items-center gap-2 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 sm:gap-2.5"
           >
-            <span className="font-display text-lg leading-tight text-primary">
-              <span className="sm:hidden">{siteConfig.shortName}</span>
-              <span className="hidden sm:inline">{siteConfig.name}</span>
+            <BrandLogoMark className="size-8 sm:size-9" />
+            <span className="text-lg leading-tight font-semibold tracking-[-0.01em] whitespace-nowrap text-primary">
+              <span className="md:hidden">{siteConfig.shortName}</span>
+              <span className="hidden md:inline">{siteConfig.name}</span>
             </span>
             <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold tracking-wide text-primary uppercase">
               Admin
@@ -41,7 +43,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               className={buttonClasses({ variant: "ghost", size: "sm", className: "h-11 px-3" })}
             >
               <Globe aria-hidden="true" className="size-4" />
-              <span className="sr-only sm:not-sr-only">View website</span>
+              <span className="sr-only md:not-sr-only">View website</span>
             </Link>
             <LogoutButton />
           </div>

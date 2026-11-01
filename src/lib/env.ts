@@ -22,7 +22,7 @@ const serverEnvSchema = z.object({
   RESEND_API_KEY: z.preprocess(blankAsUndefined, z.string().startsWith("re_").optional()),
   EMAIL_FROM: z.preprocess(
     blankAsUndefined,
-    z.string().min(3).default("MindSpace Therapy Centre <onboarding@resend.dev>"),
+    z.string().min(3).default("Mind Space Physiotherapy Clinic <onboarding@resend.dev>"),
   ),
   /** Inbox that receives new-enquiry notifications for the clinic. */
   CLINIC_NOTIFICATION_EMAIL: z.preprocess(blankAsUndefined, z.email().optional()),

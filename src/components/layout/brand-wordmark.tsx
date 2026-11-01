@@ -1,50 +1,61 @@
 import Image from "next/image";
-import Link from "next/link";
-import { brandMarkDataUri } from "@/components/seo/brand-mark";
 import { siteConfig } from "@/config/site.config";
 import { cn } from "@/lib/utils";
+import { PageLink } from "./page-link";
+
+type Tone = "default" | "inverse";
+
+/** The clinic's emblem on its own. Decorative: always sits next to the clinic name. */
+export function BrandLogoMark({ tone = "default", className }: { tone?: Tone; className?: string }) {
+  const { logo } = siteConfig;
+  return (
+    <Image
+      src={tone === "inverse" ? logo.markInverse : logo.mark}
+      alt=""
+      width={logo.size}
+      height={logo.size}
+      sizes="48px"
+      className={cn("size-11 shrink-0", className)}
+    />
+  );
+}
 
 interface BrandWordmarkProps {
   /** "inverse" for primary-coloured backgrounds such as the footer. */
-  tone?: "default" | "inverse";
+  tone?: Tone;
   className?: string;
 }
 
-const { colors } = siteConfig.theme;
-
-// The same mark geometry as the favicon, app icons and social image (one
-// definition in brand-mark.ts), drawn on a transparent background.
-const markSrc = {
-  default: brandMarkDataUri({ backgroundColor: null, markColor: colors.primary, scale: 1.2 }),
-  inverse: brandMarkDataUri({ backgroundColor: null, markColor: colors.primaryForeground, scale: 1.2 }),
-};
-
-/** Logo mark + clinic name + tagline, linking to the home page. */
+/**
+ * Emblem + name, set like the logo lockup: "Mind Space" over a small,
+ * letter-spaced "PHYSIOTHERAPY CLINIC". Read together, the two lines are the
+ * full clinic name, which is also the link's accessible name.
+ */
 export function BrandWordmark({ tone = "default", className }: BrandWordmarkProps) {
   const inverse = tone === "inverse";
 
   return (
-    <Link href="/" className={cn("inline-flex min-h-11 items-center gap-2.5 rounded-xl", className)}>
-      {/* Decorative: the clinic name beside it is the link's accessible name. */}
-      <Image src={markSrc[tone]} alt="" width={40} height={40} unoptimized className="size-10 shrink-0" />
+    <PageLink href="/" className={cn("inline-flex min-h-11 items-center gap-2.5 rounded-xl", className)}>
+      <BrandLogoMark tone={tone} />
       <span className="flex flex-col leading-none">
         <span
           className={cn(
-            "font-display text-base font-semibold tracking-tight sm:text-lg",
+            "text-lg font-semibold tracking-[-0.01em]",
             inverse ? "text-primary-foreground" : "text-primary",
           )}
         >
-          {siteConfig.name}
-        </span>
+          {siteConfig.shortName}
+        </span>{" "}
+        {/* The space above keeps the accessible name "Mind Space Physiotherapy Clinic"; flex ignores it visually. */}
         <span
           className={cn(
-            "mt-1.5 text-xs font-medium tracking-wide",
-            inverse ? "text-primary-foreground/75" : "text-muted",
+            "mt-1 text-[0.625rem] font-semibold tracking-[0.2em] uppercase",
+            inverse ? "text-primary-foreground/70" : "text-primary/70",
           )}
         >
-          {siteConfig.tagline}
+          {siteConfig.descriptor}
         </span>
       </span>
-    </Link>
+    </PageLink>
   );
 }

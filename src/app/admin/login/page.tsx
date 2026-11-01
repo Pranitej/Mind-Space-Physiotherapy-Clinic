@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/admin/login-form";
+import { BrandLogoMark } from "@/components/layout/brand-wordmark";
 import { siteConfig } from "@/config/site.config";
 import { ADMIN_HOME_PATH } from "@/lib/admin/display";
 import { getAdminSession } from "@/lib/auth/dal";
@@ -18,8 +19,13 @@ export default async function AdminLoginPage() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8">
-        <p className="font-display text-xl text-primary">{siteConfig.name}</p>
-        <p className="text-sm text-muted">{siteConfig.tagline}</p>
+        <div className="flex items-center gap-3">
+          <BrandLogoMark className="size-12" />
+          <div>
+            <p className="text-lg leading-tight font-semibold text-primary">{siteConfig.name}</p>
+            <p className="text-sm text-muted">{siteConfig.tagline}</p>
+          </div>
+        </div>
 
         <h1 className="mt-8 font-sans text-2xl font-semibold text-foreground">Admin sign in</h1>
         <p className="mt-1 text-sm text-muted">

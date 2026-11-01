@@ -17,7 +17,12 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: siteConfig.theme.colors.background,
     theme_color: siteConfig.theme.themeColor,
     icons: [
-      { src: appIconUrl(faviconIcon), type: faviconIcon.contentType, sizes: "any", purpose: "any" },
+      {
+        src: appIconUrl(faviconIcon),
+        type: faviconIcon.contentType,
+        sizes: `${faviconIcon.size}x${faviconIcon.size}`,
+        purpose: "any",
+      },
       ...manifestIcons.flatMap((icon) =>
         // The PNGs keep the mark inside the maskable safe zone, so each one is listed for both purposes.
         (["any", "maskable"] as const).map((purpose) => ({
