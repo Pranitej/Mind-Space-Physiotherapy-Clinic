@@ -25,7 +25,13 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
-    <html lang={siteConfig.locale.htmlLang} className={cn(fontSans.variable, fontDisplay.variable)}>
+    <html
+      lang={siteConfig.locale.htmlLang}
+      className={cn(fontSans.variable, fontDisplay.variable)}
+      // Next.js 16 only suspends CSS smooth scrolling during route changes when
+      // asked to. Without it, the reset to the top of a new page is animated.
+      data-scroll-behavior="smooth"
+    >
       <head>
         <style nonce={nonce} dangerouslySetInnerHTML={{ __html: themeCss }} />
       </head>
